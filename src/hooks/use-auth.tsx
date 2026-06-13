@@ -6,7 +6,6 @@ import {
   useContext,
   useEffect,
   useMemo,
-  useState,
   useSyncExternalStore,
 } from "react";
 import { AUTH_SESSION_KEY } from "@/lib/auth-data";
@@ -118,11 +117,14 @@ function useStoredSession() {
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const session = useStoredSession();
-  const [isHydrated, setIsHydrated] = useState(false);
+  const isHydrated = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
 
   useEffect(() => {
     readStoredUsers();
-    setIsHydrated(true);
   }, []);
 
   const user = useMemo(() => resolveUser(session), [session]);

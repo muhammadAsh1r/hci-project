@@ -45,10 +45,9 @@ export function SignUpForm({ callbackUrl }: SignUpFormProps) {
     callbackUrl ?? (user ? getDashboardPathForRole(user.role) : getDashboardPathForRole(role));
 
   useEffect(() => {
-    if (!isHydrated || !isAuthenticated || isRedirecting || !user) return;
-    setIsRedirecting(true);
+    if (!isHydrated || !isAuthenticated || !user) return;
     redirectAfterAuth(router, destination);
-  }, [isHydrated, isAuthenticated, isRedirecting, router, destination, user]);
+  }, [isHydrated, isAuthenticated, user, router, destination]);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -76,7 +75,7 @@ export function SignUpForm({ callbackUrl }: SignUpFormProps) {
     redirectAfterAuth(router, target);
   };
 
-  if (isRedirecting || (isHydrated && isAuthenticated)) {
+  if (isRedirecting || (isHydrated && isAuthenticated && user)) {
     return (
       <AuthRedirectState
         title="Create your account"

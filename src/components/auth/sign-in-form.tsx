@@ -37,10 +37,9 @@ export function SignInForm({ callbackUrl }: SignInFormProps) {
     callbackUrl ?? (user ? getDashboardPathForRole(user.role) : getDashboardPathForRole("freelancer"));
 
   useEffect(() => {
-    if (!isHydrated || !isAuthenticated || isRedirecting || !user) return;
-    setIsRedirecting(true);
+    if (!isHydrated || !isAuthenticated || !user) return;
     redirectAfterAuth(router, destination);
-  }, [isHydrated, isAuthenticated, isRedirecting, router, destination, user]);
+  }, [isHydrated, isAuthenticated, user, router, destination]);
 
   const fillDemoCredentials = (type: "freelancer" | "client") => {
     setEmail(DEMO_CREDENTIALS[type].email);
@@ -68,7 +67,7 @@ export function SignInForm({ callbackUrl }: SignInFormProps) {
     redirectAfterAuth(router, target);
   };
 
-  if (isRedirecting || (isHydrated && isAuthenticated)) {
+  if (isRedirecting || (isHydrated && isAuthenticated && user)) {
     return (
       <AuthRedirectState
         title="Welcome back"

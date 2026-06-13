@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useSyncExternalStore, useState } from "react";
+import { useCallback, useSyncExternalStore, useState } from "react";
 import { SEED_CLIENT_CONVERSATIONS } from "@/lib/client-messages-data";
 import {
   CLIENT_ACTIVE_CONVERSATION_KEY,
@@ -58,21 +58,19 @@ function writeConversations(conversations: ClientConversation[]) {
   notify();
 }
 
+function getInitialActiveConversationId(): string | null {
+  if (typeof window === "undefined") return null;
+  const stored = localStorage.getItem(CLIENT_ACTIVE_CONVERSATION_KEY);
+  const convs = readConversations();
+  if (stored && convs.some((c) => c.id === stored)) return stored;
+  return convs.find((c) => !c.archived)?.id ?? null;
+}
+
 export function useClientMessages() {
   const conversations = useSyncExternalStore(subscribe, getSnapshot, () => SEED_CLIENT_CONVERSATIONS);
-  const [activeId, setActiveId] = useState<string | null>(null);
+  const [activeId, setActiveId] = useState<string | null>(getInitialActiveConversationId);
   const [searchQuery, setSearchQuery] = useState("");
   const [isTyping, setIsTyping] = useState(false);
-
-  useEffect(() => {
-    const stored = localStorage.getItem(CLIENT_ACTIVE_CONVERSATION_KEY);
-    const convs = getSnapshot();
-    const id =
-      stored && convs.some((c) => c.id === stored)
-        ? stored
-        : convs.find((c) => !c.archived)?.id ?? null;
-    setActiveId(id);
-  }, []);
 
   const activeConversation = conversations.find((c) => c.id === activeId) ?? null;
 

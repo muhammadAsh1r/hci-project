@@ -4,7 +4,6 @@ import {
   createContext,
   useCallback,
   useContext,
-  useEffect,
   useMemo,
   useState,
   useSyncExternalStore,
@@ -82,10 +81,6 @@ export function ClientSettingsProvider({ children }: { children: React.ReactNode
   const settings = useSyncExternalStore(subscribe, getSnapshot, () => DEFAULT_CLIENT_SETTINGS);
   const [draft, setDraft] = useState<ClientSettings>(settings);
   const [isSaving, setIsSaving] = useState(false);
-
-  useEffect(() => {
-    setDraft(settings);
-  }, [settings]);
 
   const hasUnsavedChanges = useMemo(
     () => JSON.stringify(draft) !== JSON.stringify(settings),

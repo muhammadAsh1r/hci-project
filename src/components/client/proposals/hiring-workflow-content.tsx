@@ -11,7 +11,7 @@ import {
   Star,
 } from "lucide-react";
 import { useSearchParams } from "next/navigation";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useState } from "react";
 import { ContractPreview } from "@/components/client/proposals/contract-preview";
 import { HiringConfirmationModal } from "@/components/client/proposals/hiring-confirmation-modal";
 import { ProposalSkillMatch } from "@/components/client/proposals/proposal-skill-match";
@@ -37,27 +37,27 @@ const stepIcons = {
   escrow: Shield,
 };
 
+function getInitialHiringStep(status?: string): HiringStep {
+  if (status === "accepted") return "contract";
+  if (status === "shortlisted") return "confirm";
+  return "review";
+}
+
 function HiringWorkflowInner() {
   const searchParams = useSearchParams();
   const proposalId = searchParams.get("proposal");
   const { getProposalById, shortlist, accept } = useClientProposals();
   const { showToast, ToastContainer } = useToast();
 
-  const [currentStep, setCurrentStep] = useState<HiringStep>("review");
+  const proposal = proposalId ? getProposalById(proposalId) : undefined;
+
+  const [currentStep, setCurrentStep] = useState<HiringStep>(() =>
+    getInitialHiringStep(proposal?.status)
+  );
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [isConfirming, setIsConfirming] = useState(false);
   const [hireComplete, setHireComplete] = useState(false);
   const [escrowFunded, setEscrowFunded] = useState(false);
-
-  const proposal = proposalId ? getProposalById(proposalId) : undefined;
-
-  useEffect(() => {
-    if (proposal?.status === "shortlisted") {
-      setCurrentStep("confirm");
-    } else if (proposal?.status === "accepted") {
-      setCurrentStep("contract");
-    }
-  }, [proposal?.status]);
 
   if (!proposal) {
     return (

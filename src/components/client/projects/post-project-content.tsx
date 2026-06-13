@@ -9,7 +9,7 @@ import {
   Sparkles,
   X,
 } from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { PostProjectPreview } from "@/components/client/projects/post-project-preview";
 import {
   DESCRIPTION_MAX,
@@ -58,7 +58,12 @@ export function PostProjectContent({ editId }: PostProjectContentProps) {
   const { publishProject, saveDraftOnly, getEditFormData } = useClientProjects();
   const { showToast, ToastContainer } = useToast();
 
-  const [form, setForm] = useState<ClientProjectFormData>(DEFAULT_CLIENT_PROJECT_FORM);
+  const isEdit = Boolean(editId);
+  const [form, setForm] = useState<ClientProjectFormData>(() =>
+    editId
+      ? getEditFormData(editId) ?? DEFAULT_CLIENT_PROJECT_FORM
+      : readProjectDraft()
+  );
   const [errors, setErrors] = useState<FormErrors>({});
   const [skillInput, setSkillInput] = useState("");
   const [publishOpen, setPublishOpen] = useState(false);
@@ -66,16 +71,6 @@ export function PostProjectContent({ editId }: PostProjectContentProps) {
   const [draftSavedAt, setDraftSavedAt] = useState<string | null>(null);
   const [showPreview, setShowPreview] = useState(false);
   const draftTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const isEdit = Boolean(editId);
-
-  useEffect(() => {
-    if (editId) {
-      const data = getEditFormData(editId);
-      if (data) setForm(data);
-    } else {
-      setForm(readProjectDraft());
-    }
-  }, [editId, getEditFormData]);
 
   const scheduleAutoSave = useCallback(
     (data: ClientProjectFormData) => {

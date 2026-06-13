@@ -13,7 +13,7 @@ import {
   X,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { MilestoneStatusBadge } from "@/components/client/contracts/contract-status-badge";
 import { PaymentReleaseModal } from "@/components/client/contracts/payment-release-modal";
 import { BackLink } from "@/components/shared/back-link";
@@ -43,6 +43,14 @@ interface MilestoneReviewContentProps {
   milestone: ClientContractMilestone;
 }
 
+function getInitialMilestoneStep(
+  status: ClientContractMilestone["status"]
+): MilestoneReviewStep {
+  if (status === "Paid") return "success";
+  if (status === "Approved") return "release";
+  return "review";
+}
+
 export function MilestoneReviewContent({
   contract,
   milestone,
@@ -56,16 +64,13 @@ export function MilestoneReviewContent({
   } = useClientContracts();
   const { showToast, ToastContainer } = useToast();
 
-  const [currentStep, setCurrentStep] = useState<MilestoneReviewStep>("review");
+  const [currentStep, setCurrentStep] = useState<MilestoneReviewStep>(() =>
+    getInitialMilestoneStep(milestone.status)
+  );
   const [releaseOpen, setReleaseOpen] = useState(false);
   const [isReleasing, setIsReleasing] = useState(false);
   const [revisionOpen, setRevisionOpen] = useState(false);
   const [rejectOpen, setRejectOpen] = useState(false);
-
-  useEffect(() => {
-    if (milestone.status === "Approved") setCurrentStep("release");
-    else if (milestone.status === "Paid") setCurrentStep("success");
-  }, [milestone.status]);
 
   const currentIndex = MILESTONE_REVIEW_STEPS.findIndex((s) => s.key === currentStep);
   const isApproved = milestone.status === "Approved" || milestone.status === "Paid";
