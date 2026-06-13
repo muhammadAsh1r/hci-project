@@ -3,6 +3,7 @@
 import { Menu, Settings, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
+import { UserMenu, UserMenuMobile } from "@/components/auth/user-menu";
 import { Container } from "@/components/layout/container";
 import { NotificationBell } from "@/components/layout/notification-bell";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
@@ -15,6 +16,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Tooltip } from "@/components/shared/tooltip";
+import { useAuth } from "@/hooks/use-auth";
 import { useScrollPosition } from "@/hooks/use-scroll-position";
 import { navLinks } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
@@ -22,6 +24,7 @@ import { cn } from "@/lib/utils";
 export function Navbar() {
   const isScrolled = useScrollPosition(20);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { isAuthenticated, isHydrated } = useAuth();
 
   return (
     <header
@@ -75,15 +78,21 @@ export function Navbar() {
               <Settings className="size-4" aria-hidden="true" />
             </Link>
           </Tooltip>
-          <Link
-            href="#"
-            className="rounded-lg px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          >
-            Sign In
-          </Link>
-          <PrimaryButton href="#" size="default">
-            Get Started
-          </PrimaryButton>
+          {isHydrated && isAuthenticated ? (
+            <UserMenu />
+          ) : (
+            <>
+              <Link
+                href="/sign-in"
+                className="rounded-lg px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                Sign In
+              </Link>
+              <PrimaryButton href="/sign-up" size="default">
+                Get Started
+              </PrimaryButton>
+            </>
+          )}
         </div>
 
         <div className="flex items-center gap-2 lg:hidden">
@@ -132,18 +141,22 @@ export function Navbar() {
                 Settings
               </Link>
             </nav>
-            <div className="mt-8 flex flex-col gap-3 border-t border-border pt-8">
-              <Link
-                href="#"
-                onClick={() => setMobileOpen(false)}
-                className="rounded-xl px-4 py-3 text-center text-base font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-              >
-                Sign In
-              </Link>
-              <PrimaryButton href="#" size="default" className="w-full">
-                Get Started
-              </PrimaryButton>
-            </div>
+            {isHydrated && isAuthenticated ? (
+              <UserMenuMobile onNavigate={() => setMobileOpen(false)} />
+            ) : (
+              <div className="mt-8 flex flex-col gap-3 border-t border-border pt-8">
+                <Link
+                  href="/sign-in"
+                  onClick={() => setMobileOpen(false)}
+                  className="rounded-xl px-4 py-3 text-center text-base font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                >
+                  Sign In
+                </Link>
+                <PrimaryButton href="/sign-up" size="default" className="w-full">
+                  Get Started
+                </PrimaryButton>
+              </div>
+            )}
           </SheetContent>
         </Sheet>
         </div>

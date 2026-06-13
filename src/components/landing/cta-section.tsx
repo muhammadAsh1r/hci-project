@@ -35,7 +35,7 @@ export function CtaSection() {
 
           <div className="relative mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <PrimaryButton
-              href="#"
+              href="/sign-up"
               size="lg"
               className="bg-white text-primary hover:bg-white/90 hover:shadow-lg"
             >
