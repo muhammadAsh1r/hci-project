@@ -114,7 +114,7 @@ function useStoredSession() {
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const session = useStoredSession();
-  const [isHydrated, setIsHydrated] = useState(false);
+  const [isHydrated, setIsHydrated] = useState(() => typeof window !== "undefined");
 
   useEffect(() => {
     readStoredUsers();
@@ -134,8 +134,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (!isValidEmail(email)) {
       return { success: false, error: "Please enter a valid email address." };
     }
-
-    await new Promise((resolve) => setTimeout(resolve, 500));
 
     const storedUser = findUserByEmail(email);
     if (!storedUser || storedUser.password !== password) {
@@ -175,8 +173,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (users.some((user) => user.email.toLowerCase() === email.toLowerCase())) {
       return { success: false, error: "An account with this email already exists." };
     }
-
-    await new Promise((resolve) => setTimeout(resolve, 600));
 
     const newUser: StoredUser = {
       id: `user-${Date.now()}`,

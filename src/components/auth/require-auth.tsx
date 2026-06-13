@@ -22,7 +22,7 @@ export function RequireAuth({ children }: RequireAuthProps) {
   }, [isHydrated, isAuthenticated, pathname, router]);
 
   if (!isHydrated) {
-    return <LoadingOverlay label="Checking authentication" />;
+    return <LoadingOverlay label="Loading" />;
   }
 
   if (!isAuthenticated) {

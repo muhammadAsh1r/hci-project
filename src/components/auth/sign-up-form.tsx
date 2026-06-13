@@ -2,9 +2,10 @@
 
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { AuthPageLayout } from "@/components/auth/auth-page-layout";
+import { AuthRedirectState } from "@/components/auth/auth-redirect-state";
 import { PrimaryButton } from "@/components/shared/primary-button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,10 +19,14 @@ import {
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
 import type { UserRole } from "@/lib/types/auth";
+import { redirectAfterAuth } from "@/lib/auth-utils";
 
-export function SignUpForm() {
+interface SignUpFormProps {
+  callbackUrl?: string;
+}
+
+export function SignUpForm({ callbackUrl = "/dashboard" }: SignUpFormProps) {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const { signUp, isAuthenticated, isHydrated } = useAuth();
   const { showToast, ToastContainer } = useToast();
 
@@ -33,14 +38,13 @@ export function SignUpForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const callbackUrl = searchParams.get("callbackUrl") ?? "/dashboard";
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
   useEffect(() => {
-    if (isHydrated && isAuthenticated) {
-      router.replace(callbackUrl);
-    }
-  }, [isHydrated, isAuthenticated, router, callbackUrl]);
+    if (!isHydrated || !isAuthenticated || isRedirecting) return;
+    setIsRedirecting(true);
+    redirectAfterAuth(router, callbackUrl);
+  }, [isHydrated, isAuthenticated, isRedirecting, router, callbackUrl]);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -61,10 +65,20 @@ export function SignUpForm() {
       return;
     }
 
+    setIsRedirecting(true);
     showToast("Account created successfully. Welcome to FreelanceAI!", "success");
-    router.push(callbackUrl);
-    router.refresh();
+    redirectAfterAuth(router, callbackUrl);
   };
+
+  if (isRedirecting || (isHydrated && isAuthenticated)) {
+    return (
+      <AuthRedirectState
+        title="Create your account"
+        description="Join FreelanceAI to find projects, hire talent, and manage secure payments."
+        message="Account ready. Taking you to your dashboard..."
+      />
+    );
+  }
 
   return (
     <AuthPageLayout

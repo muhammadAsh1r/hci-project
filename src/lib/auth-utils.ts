@@ -59,3 +59,17 @@ export function findUserByEmail(email: string): StoredUser | undefined {
     (user) => user.email.trim().toLowerCase() === normalized
   );
 }
+
+export function redirectAfterAuth(
+  router: { replace: (href: string) => void },
+  url: string
+) {
+  router.replace(url);
+
+  window.setTimeout(() => {
+    const targetPath = new URL(url, window.location.origin).pathname;
+    if (window.location.pathname !== targetPath) {
+      window.location.assign(url);
+    }
+  }, 300);
+}

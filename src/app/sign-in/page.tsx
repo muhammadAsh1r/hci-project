@@ -1,16 +1,16 @@
-import { Suspense } from "react";
 import { SignInForm } from "@/components/auth/sign-in-form";
-import { LoadingOverlay } from "@/components/shared/loading-spinner";
 
 export const metadata = {
   title: "Sign In — FreelanceAI",
   description: "Sign in to your FreelanceAI account to access your dashboard and manage projects.",
 };
 
-export default function SignInPage() {
-  return (
-    <Suspense fallback={<LoadingOverlay label="Loading sign in" />}>
-      <SignInForm />
-    </Suspense>
-  );
+interface SignInPageProps {
+  searchParams: Promise<{ callbackUrl?: string }>;
+}
+
+export default async function SignInPage({ searchParams }: SignInPageProps) {
+  const { callbackUrl } = await searchParams;
+
+  return <SignInForm callbackUrl={callbackUrl ?? "/dashboard"} />;
 }

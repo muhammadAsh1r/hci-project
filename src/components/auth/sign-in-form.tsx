@@ -2,9 +2,10 @@
 
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { AuthPageLayout } from "@/components/auth/auth-page-layout";
+import { AuthRedirectState } from "@/components/auth/auth-redirect-state";
 import { PrimaryButton } from "@/components/shared/primary-button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -12,10 +13,14 @@ import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
 import { DEMO_CREDENTIALS } from "@/lib/auth-data";
+import { redirectAfterAuth } from "@/lib/auth-utils";
 
-export function SignInForm() {
+interface SignInFormProps {
+  callbackUrl?: string;
+}
+
+export function SignInForm({ callbackUrl = "/dashboard" }: SignInFormProps) {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const { signIn, isAuthenticated, isHydrated } = useAuth();
   const { showToast, ToastContainer } = useToast();
 
@@ -25,14 +30,13 @@ export function SignInForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const callbackUrl = searchParams.get("callbackUrl") ?? "/dashboard";
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
   useEffect(() => {
-    if (isHydrated && isAuthenticated) {
-      router.replace(callbackUrl);
-    }
-  }, [isHydrated, isAuthenticated, router, callbackUrl]);
+    if (!isHydrated || !isAuthenticated || isRedirecting) return;
+    setIsRedirecting(true);
+    redirectAfterAuth(router, callbackUrl);
+  }, [isHydrated, isAuthenticated, isRedirecting, router, callbackUrl]);
 
   const fillDemoCredentials = (type: "freelancer" | "client") => {
     setEmail(DEMO_CREDENTIALS[type].email);
@@ -53,10 +57,20 @@ export function SignInForm() {
       return;
     }
 
+    setIsRedirecting(true);
     showToast("Welcome back! Redirecting to your dashboard.", "success");
-    router.push(callbackUrl);
-    router.refresh();
+    redirectAfterAuth(router, callbackUrl);
   };
+
+  if (isRedirecting || (isHydrated && isAuthenticated)) {
+    return (
+      <AuthRedirectState
+        title="Welcome back"
+        description="Sign in to access your dashboard, proposals, and escrow payments."
+        message="Signed in successfully. Taking you to your dashboard..."
+      />
+    );
+  }
 
   return (
     <AuthPageLayout
