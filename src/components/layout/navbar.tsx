@@ -17,8 +17,10 @@ import {
 } from "@/components/ui/sheet";
 import { Tooltip } from "@/components/shared/tooltip";
 import { useAuth } from "@/hooks/use-auth";
+import { useDemoMode } from "@/hooks/use-demo-mode";
 import { useScrollPosition } from "@/hooks/use-scroll-position";
 import { getNotificationsPathForRole, getSettingsPathForRole } from "@/lib/auth-routes";
+import { DEMO_ROUTES } from "@/lib/demo-routes";
 import { navLinks } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
 
@@ -26,12 +28,20 @@ export function Navbar() {
   const isScrolled = useScrollPosition(20);
   const [mobileOpen, setMobileOpen] = useState(false);
   const { user, isAuthenticated, isHydrated } = useAuth();
-  const notificationsPath = isHydrated && user
-    ? getNotificationsPathForRole(user.role)
-    : "/notifications";
-  const settingsPath = isHydrated && user
-    ? getSettingsPathForRole(user.role)
-    : "/settings";
+  const demoMode = useDemoMode();
+  const isDemo = demoMode?.isDemoMode ?? false;
+  const notificationsPath = isDemo
+    ? "/notifications"
+    : isHydrated && user
+      ? getNotificationsPathForRole(user.role)
+      : "/notifications";
+  const settingsPath = isDemo
+    ? user?.role === "client"
+      ? "/client/settings"
+      : DEMO_ROUTES.settings
+    : isHydrated && user
+      ? getSettingsPathForRole(user.role)
+      : "/settings";
 
   return (
     <header

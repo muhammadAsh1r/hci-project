@@ -1,14 +1,14 @@
-import { RequireClientAuth } from "@/components/auth/require-client-auth";
+import { DemoAuthProvider } from "@/components/demo/demo-auth-provider";
 import { ClientAppShell } from "@/components/layout/client-app-shell";
 
-export default function ClientLayout({
+export default function DemoClientShellLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <RequireClientAuth>
+    <DemoAuthProvider role="client">
       <ClientAppShell>{children}</ClientAppShell>
-    </RequireClientAuth>
+    </DemoAuthProvider>
   );
 }

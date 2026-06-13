@@ -25,7 +25,13 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { useDemoMode } from "@/hooks/use-demo-mode";
 import { clientNavItems } from "@/lib/client-dashboard-data";
+import {
+  DEMO_ROUTES,
+  demoClientNavItems,
+  isDemoClientNavActive,
+} from "@/lib/demo-routes";
 import { cn } from "@/lib/utils";
 
 const iconMap = {
@@ -42,7 +48,11 @@ const iconMap = {
   Settings,
 };
 
-function isClientNavItemActive(pathname: string, href: string): boolean {
+function isClientNavItemActive(pathname: string, href: string, isDemo: boolean): boolean {
+  if (isDemo) {
+    return isDemoClientNavActive(pathname, href);
+  }
+
   if (href === "/client/dashboard") return pathname === "/client/dashboard";
   return pathname === href || pathname.startsWith(`${href}/`);
 }
@@ -54,12 +64,15 @@ interface ClientSidebarProps {
 
 function ClientNavLinks({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
+  const demoMode = useDemoMode();
+  const isDemo = demoMode?.isDemoMode ?? false;
+  const navItems = isDemo ? demoClientNavItems : clientNavItems;
 
   return (
     <nav className="flex flex-1 flex-col gap-1" aria-label="Client navigation">
-      {clientNavItems.map((item) => {
+      {navItems.map((item) => {
         const Icon = iconMap[item.icon];
-        const isActive = isClientNavItemActive(pathname, item.href);
+        const isActive = isClientNavItemActive(pathname, item.href, isDemo);
 
         return (
           <Link
@@ -85,6 +98,9 @@ function ClientNavLinks({ onNavigate }: { onNavigate?: () => void }) {
 
 export function ClientSidebar() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const demoMode = useDemoMode();
+  const isDemo = demoMode?.isDemoMode ?? false;
+  const homeHref = isDemo ? DEMO_ROUTES.clientDashboard : "/client/dashboard";
 
   return (
     <>
@@ -95,7 +111,7 @@ export function ClientSidebar() {
         <div className="sticky top-16 flex h-[calc(100vh-4rem)] flex-col p-4">
           <div className="mb-6 px-3">
             <Link
-              href="/client/dashboard"
+              href={homeHref}
               className="flex items-center gap-2 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               <div className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">

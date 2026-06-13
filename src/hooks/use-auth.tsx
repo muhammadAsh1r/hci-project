@@ -39,7 +39,7 @@ interface AuthContextValue {
   signOut: () => void;
 }
 
-const AuthContext = createContext<AuthContextValue | null>(null);
+export const AuthContext = createContext<AuthContextValue | null>(null);
 
 const authListeners = new Set<() => void>();
 let sessionCache: { raw: string; session: AuthSession | null } | null = null;

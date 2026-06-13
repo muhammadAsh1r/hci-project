@@ -8,26 +8,33 @@ import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/hooks/use-auth";
+import { useDemoMode } from "@/hooks/use-demo-mode";
 import { clientNavItems } from "@/lib/client-dashboard-data";
+import { demoClientNavItems } from "@/lib/demo-routes";
 
-function getPageTitle(pathname: string): string {
-  const match = clientNavItems.find(
+function getPageTitle(pathname: string, navItems: typeof clientNavItems): string {
+  const match = navItems.find(
     (item) =>
       pathname === item.href ||
-      (item.href !== "/client/dashboard" && pathname.startsWith(item.href))
+      (item.href !== "/client/dashboard" &&
+        item.href !== "/demo/client-dashboard" &&
+        pathname.startsWith(item.href))
   );
   return match?.label ?? "Client Portal";
 }
 
-function isClientDetailPage(pathname: string): boolean {
-  return clientNavItems.every((item) => pathname !== item.href);
+function isClientDetailPage(pathname: string, navItems: typeof clientNavItems): boolean {
+  return navItems.every((item) => pathname !== item.href);
 }
 
 export function ClientTopNav() {
   const pathname = usePathname();
   const { user } = useAuth();
-  const pageTitle = getPageTitle(pathname);
-  const isDetailPage = isClientDetailPage(pathname);
+  const demoMode = useDemoMode();
+  const isDemo = demoMode?.isDemoMode ?? false;
+  const navItems = isDemo ? demoClientNavItems : clientNavItems;
+  const pageTitle = getPageTitle(pathname, navItems);
+  const isDetailPage = isClientDetailPage(pathname, navItems);
   const TitleTag = isDetailPage ? "p" : "h1";
 
   return (

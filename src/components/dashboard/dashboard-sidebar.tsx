@@ -11,7 +11,13 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useDemoMode } from "@/hooks/use-demo-mode";
 import { dashboardNavItems } from "@/lib/dashboard-data";
+import {
+  DEMO_ROUTES,
+  demoFreelancerNavItems,
+  isDemoFreelancerNavActive,
+} from "@/lib/demo-routes";
 import { cn } from "@/lib/utils";
 
 const iconMap = {
@@ -32,6 +38,10 @@ function isNavItemActive(pathname: string, href: string): boolean {
 
 export function DashboardSidebar() {
   const pathname = usePathname();
+  const demoMode = useDemoMode();
+  const isDemo = demoMode?.isDemoMode ?? false;
+  const navItems = isDemo ? demoFreelancerNavItems : dashboardNavItems;
+  const homeHref = isDemo ? DEMO_ROUTES.dashboard : "/dashboard";
 
   return (
     <>
@@ -42,7 +52,7 @@ export function DashboardSidebar() {
         <div className="sticky top-16 flex h-[calc(100vh-4rem)] flex-col p-4">
           <div className="mb-6 px-3">
             <Link
-              href="/dashboard"
+              href={homeHref}
               className="flex items-center gap-2 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               <div className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
@@ -56,9 +66,11 @@ export function DashboardSidebar() {
           </div>
 
           <nav className="flex flex-1 flex-col gap-1" aria-label="Freelancer dashboard navigation">
-            {dashboardNavItems.map((item) => {
+            {navItems.map((item) => {
               const Icon = iconMap[item.icon];
-              const isActive = isNavItemActive(pathname, item.href);
+              const isActive = isDemo
+                ? isDemoFreelancerNavActive(pathname, item.href)
+                : isNavItemActive(pathname, item.href);
 
               return (
                 <Link
@@ -83,9 +95,11 @@ export function DashboardSidebar() {
         className="fixed inset-x-0 bottom-0 z-40 flex border-t border-border bg-card lg:hidden"
         aria-label="Mobile dashboard navigation"
       >
-        {dashboardNavItems.map((item) => {
+        {navItems.map((item) => {
           const Icon = iconMap[item.icon];
-          const isActive = isNavItemActive(pathname, item.href);
+          const isActive = isDemo
+            ? isDemoFreelancerNavActive(pathname, item.href)
+            : isNavItemActive(pathname, item.href);
 
           return (
             <Link

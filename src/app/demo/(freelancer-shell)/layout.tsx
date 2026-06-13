@@ -1,14 +1,14 @@
-import { RequireAuth } from "@/components/auth/require-auth";
+import { DemoAuthProvider } from "@/components/demo/demo-auth-provider";
 import { FreelancerAppShell } from "@/components/layout/freelancer-app-shell";
 
-export default function DashboardLayout({
+export default function DemoFreelancerShellLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <RequireAuth>
+    <DemoAuthProvider role="freelancer">
       <FreelancerAppShell>{children}</FreelancerAppShell>
-    </RequireAuth>
+    </DemoAuthProvider>
   );
 }
