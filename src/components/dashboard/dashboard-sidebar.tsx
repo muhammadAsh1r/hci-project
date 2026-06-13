@@ -55,7 +55,7 @@ export function DashboardSidebar() {
             <p className="mt-1 px-1 text-xs text-muted-foreground">Freelancer Workspace</p>
           </div>
 
-          <nav className="flex flex-1 flex-col gap-1">
+          <nav className="flex flex-1 flex-col gap-1" aria-label="Freelancer dashboard navigation">
             {dashboardNavItems.map((item) => {
               const Icon = iconMap[item.icon];
               const isActive = isNavItemActive(pathname, item.href);

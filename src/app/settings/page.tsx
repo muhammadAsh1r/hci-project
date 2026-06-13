@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { RequireFreelancerAuth } from "@/components/auth/require-freelancer-auth";
 import { PageHeaderSkeleton, ListSkeleton } from "@/components/shared/list-skeleton";
 import { PageShell } from "@/components/shared/page-shell";
 import { SettingsContent } from "@/components/settings/settings-content";
@@ -20,8 +21,10 @@ function SettingsFallback() {
 
 export default function SettingsPage() {
   return (
-    <Suspense fallback={<SettingsFallback />}>
-      <SettingsContent />
-    </Suspense>
+    <RequireFreelancerAuth clientRedirect="settings">
+      <Suspense fallback={<SettingsFallback />}>
+        <SettingsContent />
+      </Suspense>
+    </RequireFreelancerAuth>
   );
 }

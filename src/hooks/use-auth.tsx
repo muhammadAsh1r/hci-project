@@ -31,8 +31,12 @@ interface AuthContextValue {
   user: AuthUser | null;
   isAuthenticated: boolean;
   isHydrated: boolean;
-  signIn: (credentials: SignInCredentials) => Promise<{ success: boolean; error?: string }>;
-  signUp: (credentials: SignUpCredentials) => Promise<{ success: boolean; error?: string }>;
+  signIn: (
+    credentials: SignInCredentials
+  ) => Promise<{ success: boolean; error?: string; user?: AuthUser }>;
+  signUp: (
+    credentials: SignUpCredentials
+  ) => Promise<{ success: boolean; error?: string; user?: AuthUser }>;
   signOut: () => void;
 }
 
@@ -114,7 +118,7 @@ function useStoredSession() {
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const session = useStoredSession();
-  const [isHydrated, setIsHydrated] = useState(() => typeof window !== "undefined");
+  const [isHydrated, setIsHydrated] = useState(false);
 
   useEffect(() => {
     readStoredUsers();
@@ -146,7 +150,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       signedInAt: new Date().toISOString(),
     });
 
-    return { success: true };
+    return { success: true, user: toAuthUser(storedUser) };
   }, []);
 
   const signUp = useCallback(async (credentials: SignUpCredentials) => {
@@ -195,7 +199,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       signedInAt: new Date().toISOString(),
     });
 
-    return { success: true };
+    return { success: true, user: toAuthUser(newUser) };
   }, []);
 
   const signOut = useCallback(() => {

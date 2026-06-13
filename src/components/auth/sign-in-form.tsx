@@ -13,15 +13,16 @@ import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
 import { DEMO_CREDENTIALS } from "@/lib/auth-data";
+import { getDashboardPathForRole } from "@/lib/auth-routes";
 import { redirectAfterAuth } from "@/lib/auth-utils";
 
 interface SignInFormProps {
   callbackUrl?: string;
 }
 
-export function SignInForm({ callbackUrl = "/dashboard" }: SignInFormProps) {
+export function SignInForm({ callbackUrl }: SignInFormProps) {
   const router = useRouter();
-  const { signIn, isAuthenticated, isHydrated } = useAuth();
+  const { signIn, isAuthenticated, isHydrated, user } = useAuth();
   const { showToast, ToastContainer } = useToast();
 
   const [email, setEmail] = useState("");
@@ -32,11 +33,14 @@ export function SignInForm({ callbackUrl = "/dashboard" }: SignInFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
 
+  const destination =
+    callbackUrl ?? (user ? getDashboardPathForRole(user.role) : getDashboardPathForRole("freelancer"));
+
   useEffect(() => {
-    if (!isHydrated || !isAuthenticated || isRedirecting) return;
+    if (!isHydrated || !isAuthenticated || isRedirecting || !user) return;
     setIsRedirecting(true);
-    redirectAfterAuth(router, callbackUrl);
-  }, [isHydrated, isAuthenticated, isRedirecting, router, callbackUrl]);
+    redirectAfterAuth(router, destination);
+  }, [isHydrated, isAuthenticated, isRedirecting, router, destination, user]);
 
   const fillDemoCredentials = (type: "freelancer" | "client") => {
     setEmail(DEMO_CREDENTIALS[type].email);
@@ -59,7 +63,9 @@ export function SignInForm({ callbackUrl = "/dashboard" }: SignInFormProps) {
 
     setIsRedirecting(true);
     showToast("Welcome back! Redirecting to your dashboard.", "success");
-    redirectAfterAuth(router, callbackUrl);
+    const target =
+      callbackUrl ?? getDashboardPathForRole(result.user?.role ?? "freelancer");
+    redirectAfterAuth(router, target);
   };
 
   if (isRedirecting || (isHydrated && isAuthenticated)) {
@@ -80,7 +86,7 @@ export function SignInForm({ callbackUrl = "/dashboard" }: SignInFormProps) {
         <p className="text-muted-foreground">
           Don&apos;t have an account?{" "}
           <Link
-            href={`/sign-up${callbackUrl !== "/dashboard" ? `?callbackUrl=${encodeURIComponent(callbackUrl)}` : ""}`}
+            href={`/sign-up${callbackUrl ? `?callbackUrl=${encodeURIComponent(callbackUrl)}` : ""}`}
             className="font-medium text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             Create one

@@ -1,4 +1,5 @@
 import { NotificationsContent } from "@/components/notifications/notifications-content";
+import { RequireFreelancerAuth } from "@/components/auth/require-freelancer-auth";
 
 export const metadata = {
   title: "Notifications — FreelanceAI",
@@ -6,5 +7,9 @@ export const metadata = {
 };
 
 export default function NotificationsPage() {
-  return <NotificationsContent />;
+  return (
+    <RequireFreelancerAuth clientRedirect="notifications">
+      <NotificationsContent />
+    </RequireFreelancerAuth>
+  );
 }

@@ -18,13 +18,20 @@ import {
 import { Tooltip } from "@/components/shared/tooltip";
 import { useAuth } from "@/hooks/use-auth";
 import { useScrollPosition } from "@/hooks/use-scroll-position";
+import { getNotificationsPathForRole, getSettingsPathForRole } from "@/lib/auth-routes";
 import { navLinks } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
 
 export function Navbar() {
   const isScrolled = useScrollPosition(20);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const { isAuthenticated, isHydrated } = useAuth();
+  const { user, isAuthenticated, isHydrated } = useAuth();
+  const notificationsPath = isHydrated && user
+    ? getNotificationsPathForRole(user.role)
+    : "/notifications";
+  const settingsPath = isHydrated && user
+    ? getSettingsPathForRole(user.role)
+    : "/settings";
 
   return (
     <header
@@ -71,7 +78,7 @@ export function Navbar() {
           </Tooltip>
           <Tooltip content="Settings">
             <Link
-              href="/settings"
+              href={settingsPath}
               className="inline-flex size-10 items-center justify-center rounded-xl border border-border bg-card text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               aria-label="Settings"
             >
@@ -127,14 +134,14 @@ export function Navbar() {
                 </Link>
               ))}
               <Link
-                href="/notifications"
+                href={notificationsPath}
                 onClick={() => setMobileOpen(false)}
                 className="rounded-xl px-4 py-3 text-base font-medium text-foreground transition-colors hover:bg-accent"
               >
                 Notifications
               </Link>
               <Link
-                href="/settings"
+                href={settingsPath}
                 onClick={() => setMobileOpen(false)}
                 className="rounded-xl px-4 py-3 text-base font-medium text-foreground transition-colors hover:bg-accent"
               >

@@ -238,9 +238,9 @@ export const footerLinks = {
   product: [
     { label: "Find Projects", href: "/projects" },
     { label: "Hire Freelancers", href: "/freelancers" },
-    { label: "AI Features", href: "#ai-features" },
-    { label: "Pricing", href: "#pricing" },
-    { label: "Escrow", href: "#" },
+    { label: "AI Features", href: "/#ai-features" },
+    { label: "Pricing", href: "/#pricing" },
+    { label: "Escrow", href: "/dashboard/escrow" },
   ],
   resources: [
     { label: "Help Center", href: "#" },

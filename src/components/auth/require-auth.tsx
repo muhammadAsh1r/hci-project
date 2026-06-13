@@ -4,6 +4,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { LoadingOverlay } from "@/components/shared/loading-spinner";
 import { useAuth } from "@/hooks/use-auth";
+import { CLIENT_DASHBOARD_PATH } from "@/lib/auth-routes";
 
 interface RequireAuthProps {
   children: React.ReactNode;
@@ -12,21 +13,24 @@ interface RequireAuthProps {
 export function RequireAuth({ children }: RequireAuthProps) {
   const router = useRouter();
   const pathname = usePathname();
-  const { isAuthenticated, isHydrated } = useAuth();
+  const { user, isAuthenticated, isHydrated } = useAuth();
 
   useEffect(() => {
-    if (isHydrated && !isAuthenticated) {
+    if (!isHydrated) return;
+
+    if (!isAuthenticated) {
       const callbackUrl = encodeURIComponent(pathname);
       router.replace(`/sign-in?callbackUrl=${callbackUrl}`);
+      return;
     }
-  }, [isHydrated, isAuthenticated, pathname, router]);
 
-  if (!isHydrated) {
+    if (user?.role === "client") {
+      router.replace(CLIENT_DASHBOARD_PATH);
+    }
+  }, [isHydrated, isAuthenticated, user, pathname, router]);
+
+  if (!isHydrated || !isAuthenticated || user?.role === "client") {
     return <LoadingOverlay label="Loading" />;
-  }
-
-  if (!isAuthenticated) {
-    return <LoadingOverlay label="Redirecting to sign in" />;
   }
 
   return <>{children}</>;

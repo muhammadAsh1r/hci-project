@@ -58,7 +58,7 @@ export const mockNotifications: AppNotification[] = [
     description: "Michael Torres: \"Can you start the redesign next Monday?\"",
     timestamp: "2 hours ago",
     actionLabel: "Reply",
-    actionHref: "/freelancers",
+    actionHref: "/dashboard",
     icon: "MessageSquare",
   },
   {
@@ -69,8 +69,8 @@ export const mockNotifications: AppNotification[] = [
     title: "New Message",
     description: "David Kim sent you a message about the AI chatbot project.",
     timestamp: "2 days ago",
-    actionLabel: "View Message",
-    actionHref: "/freelancers",
+    actionLabel: "View Dashboard",
+    actionHref: "/dashboard",
     icon: "MessageSquare",
   },
   {

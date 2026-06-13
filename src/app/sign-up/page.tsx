@@ -12,5 +12,5 @@ interface SignUpPageProps {
 export default async function SignUpPage({ searchParams }: SignUpPageProps) {
   const { callbackUrl } = await searchParams;
 
-  return <SignUpForm callbackUrl={callbackUrl ?? "/dashboard"} />;
+  return <SignUpForm callbackUrl={callbackUrl} />;
 }

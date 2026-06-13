@@ -19,15 +19,16 @@ import {
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
 import type { UserRole } from "@/lib/types/auth";
+import { getDashboardPathForRole } from "@/lib/auth-routes";
 import { redirectAfterAuth } from "@/lib/auth-utils";
 
 interface SignUpFormProps {
   callbackUrl?: string;
 }
 
-export function SignUpForm({ callbackUrl = "/dashboard" }: SignUpFormProps) {
+export function SignUpForm({ callbackUrl }: SignUpFormProps) {
   const router = useRouter();
-  const { signUp, isAuthenticated, isHydrated } = useAuth();
+  const { signUp, isAuthenticated, isHydrated, user } = useAuth();
   const { showToast, ToastContainer } = useToast();
 
   const [name, setName] = useState("");
@@ -40,11 +41,14 @@ export function SignUpForm({ callbackUrl = "/dashboard" }: SignUpFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
 
+  const destination =
+    callbackUrl ?? (user ? getDashboardPathForRole(user.role) : getDashboardPathForRole(role));
+
   useEffect(() => {
-    if (!isHydrated || !isAuthenticated || isRedirecting) return;
+    if (!isHydrated || !isAuthenticated || isRedirecting || !user) return;
     setIsRedirecting(true);
-    redirectAfterAuth(router, callbackUrl);
-  }, [isHydrated, isAuthenticated, isRedirecting, router, callbackUrl]);
+    redirectAfterAuth(router, destination);
+  }, [isHydrated, isAuthenticated, isRedirecting, router, destination, user]);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -67,7 +71,9 @@ export function SignUpForm({ callbackUrl = "/dashboard" }: SignUpFormProps) {
 
     setIsRedirecting(true);
     showToast("Account created successfully. Welcome to FreelanceAI!", "success");
-    redirectAfterAuth(router, callbackUrl);
+    const target =
+      callbackUrl ?? getDashboardPathForRole(result.user?.role ?? role);
+    redirectAfterAuth(router, target);
   };
 
   if (isRedirecting || (isHydrated && isAuthenticated)) {
@@ -88,7 +94,7 @@ export function SignUpForm({ callbackUrl = "/dashboard" }: SignUpFormProps) {
         <p className="text-muted-foreground">
           Already have an account?{" "}
           <Link
-            href={`/sign-in${callbackUrl !== "/dashboard" ? `?callbackUrl=${encodeURIComponent(callbackUrl)}` : ""}`}
+            href={`/sign-in${callbackUrl ? `?callbackUrl=${encodeURIComponent(callbackUrl)}` : ""}`}
             className="font-medium text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             Sign in

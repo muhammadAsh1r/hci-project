@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useAuth } from "@/hooks/use-auth";
+import { getDashboardPathForRole, getSettingsPathForRole } from "@/lib/auth-routes";
 import { cn } from "@/lib/utils";
 
 interface UserMenuProps {
@@ -50,9 +51,12 @@ export function UserMenu({ onNavigate, className }: UserMenuProps) {
     router.refresh();
   };
 
+  const dashboardPath = getDashboardPathForRole(user.role);
+  const settingsPath = getSettingsPathForRole(user.role);
+
   const menuItems = [
-    { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { href: "/settings", label: "Settings", icon: Settings },
+    { href: dashboardPath, label: "Dashboard", icon: LayoutDashboard },
+    { href: settingsPath, label: "Settings", icon: Settings },
   ];
 
   return (
@@ -127,6 +131,8 @@ export function UserMenuMobile({ onNavigate }: { onNavigate?: () => void }) {
 
   if (!user) return null;
 
+  const dashboardPath = getDashboardPathForRole(user.role);
+
   const handleSignOut = () => {
     signOut();
     onNavigate?.();
@@ -149,7 +155,7 @@ export function UserMenuMobile({ onNavigate }: { onNavigate?: () => void }) {
       </div>
 
       <Link
-        href="/dashboard"
+        href={dashboardPath}
         onClick={onNavigate}
         className="flex items-center gap-3 rounded-xl px-4 py-3 text-base font-medium text-foreground transition-colors hover:bg-accent"
       >

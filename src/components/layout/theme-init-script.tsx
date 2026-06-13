@@ -1,14 +1,19 @@
+"use client";
+
+import { useServerInsertedHTML } from "next/navigation";
 import { getThemeInitScript } from "@/lib/preferences-utils";
 
 /**
- * Blocking theme script — must be a Server Component rendered as the first
- * child of <body>. Do not move into <head> or a Client Component.
+ * Injects the blocking theme script into the SSR HTML stream outside the React
+ * tree so React 19 does not warn about script tags during client rendering.
  */
 export function ThemeInitScript() {
-  return (
+  useServerInsertedHTML(() => (
     <script
       dangerouslySetInnerHTML={{ __html: getThemeInitScript() }}
       suppressHydrationWarning
     />
-  );
+  ));
+
+  return null;
 }

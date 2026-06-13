@@ -12,5 +12,5 @@ interface SignInPageProps {
 export default async function SignInPage({ searchParams }: SignInPageProps) {
   const { callbackUrl } = await searchParams;
 
-  return <SignInForm callbackUrl={callbackUrl ?? "/dashboard"} />;
+  return <SignInForm callbackUrl={callbackUrl} />;
 }

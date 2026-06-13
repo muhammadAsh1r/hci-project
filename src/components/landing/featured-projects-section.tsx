@@ -8,6 +8,15 @@ import { SectionHeading } from "@/components/shared/section-heading";
 import { Badge } from "@/components/ui/badge";
 import { projects } from "@/lib/mock-data";
 
+const FEATURED_PROJECT_SLUGS: Record<number, string> = {
+  1: "ecommerce-redesign",
+  2: "mobile-app-mvp",
+  3: "brand-identity",
+  4: "ai-chatbot",
+  5: "seo-content",
+  6: "cloud-migration",
+};
+
 export function FeaturedProjectsSection() {
   return (
     <section
@@ -58,7 +67,7 @@ export function FeaturedProjectsSection() {
                 ))}
               </div>
 
-              <PrimaryButton href="#" className="w-full">
+              <PrimaryButton href={`/projects/${FEATURED_PROJECT_SLUGS[project.id]}`} className="w-full">
                 Apply Now
                 <ArrowRight className="size-4" aria-hidden="true" />
               </PrimaryButton>
